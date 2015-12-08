@@ -23,7 +23,9 @@ class Picture(object):
         for obj in self.obj_set:
             s.append('\t' + str(obj))
         return '\n'.join(s)
-    
+ 
+p = Picture(1, 2, 3)
+print p.__dict__   
         
 class Window(object):
     def __init__(self, xmin, ymin, xmax, ymax):
@@ -32,10 +34,8 @@ class Window(object):
         self.ymin = int(ymin)
         self.xmax = int(xmax)
         self.ymax = int(ymax)
-        self.score = None
-        self.y_true = None
-        self.y_pred = None
     
     def __repr__(self):
-        return 'Window(index=%s, xmin=%s, ymin=%s, xmax=%s, ymax=%s score=%s, y_true=%s, y_pred=%s)' % (self.index,
-                self.xmin, self.ymin, self.xmax, self.ymax, self.score, self.y_true, self.y_pred)
+        return 'W(index=%s, xmin=%s, ymin=%s, xmax=%s, ymax=%s)' % (
+                self.index, self.xmin, self.ymin, self.xmax, self.ymax)
+
