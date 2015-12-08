@@ -24,9 +24,6 @@ class Picture(object):
             s.append('\t' + str(obj))
         return '\n'.join(s)
  
-p = Picture(1, 2, 3)
-print p.__dict__   
-        
 class Window(object):
     def __init__(self, xmin, ymin, xmax, ymax):
         self.index = None

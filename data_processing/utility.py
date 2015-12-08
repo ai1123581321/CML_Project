@@ -1,10 +1,10 @@
 def is_obj_valid(para_map, target_name):
     return para_map['name'] == target_name and para_map['truncated'] == '0' and para_map['difficult'] == '0'
 
-def check_win_boundary(picture, w_xmax, w_ymax):
+def check_win_boundary(p, w_xmax, w_ymax):
     # Given a Picture instance, and a candidate window's 
     # coordinate values, check if the window is valid or not
-    return picture.width >= w_xmax and picture.height >= w_ymax
+    return p.width >= w_xmax and p.height >= w_ymax
 
 def computeOverlap(A, B, C, D, E, F, G, H):
         # A=w.xmin, B=w.ymin, C=w.xmax, D=w.ymax
