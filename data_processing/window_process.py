@@ -1,5 +1,5 @@
 from entity import Window
-from utility import computeOverlap, check_win_boundary, crop_window, save_window_csv
+from utility import computeOverlap, check_win_boundary
 from image_process import parse_image_metadata
 
 def update_win_label(p, w, threshold=0.5):
@@ -14,7 +14,7 @@ def update_win_label(p, w, threshold=0.5):
         max_overlap_rate = new_rate if new_rate > max_overlap_rate else max_overlap_rate
     w.y_true = 1 if max_overlap_rate >= threshold else -1
 
-def window_builder(picture, unit_ratio, overlap_ratio=None, winList=None):
+def window_builder(picture, unit_ratio, overlap_ratio, winList):
     # Given a Picture instance, plus the unit_ratio and overlap_ratio of Window, 
     # build a list of candidate windows' boundary
     w = picture.width
@@ -28,7 +28,7 @@ def window_builder(picture, unit_ratio, overlap_ratio=None, winList=None):
     xmin, ymin, xmax, ymax = 0, 0, win_width, win_width
     while check_win_boundary(p=picture, w_xmax=xmax, w_ymax=ymax):
         while check_win_boundary(p=picture, w_xmax=xmax, w_ymax=ymax):
-            win = Window(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
+            win = Window(index=len(winList) + 1, xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
             update_win_label(p=picture, w=win)
             winList.append(win)
             ymin += overlap
@@ -38,33 +38,11 @@ def window_builder(picture, unit_ratio, overlap_ratio=None, winList=None):
         ymin, ymax = 0, win_width
     return winList
 
-def exhaustive_search(image_path, metadata_path, target, unit_ratio_list, overlap_ratio=None):
-    picture = parse_image_metadata(metadata_path, target_name=target)
+def exhaustive_search(image_path, metadata_path, unit_ratio_list, overlap_ratio):
+    # Given an image and its annotation meta data, generate all possible windows with the target
+    picture = parse_image_metadata(metadata_path)
     windowL = []
     if len(picture.obj_set) > 0:
         for ratio in unit_ratio_list:
             window_builder(picture, unit_ratio=ratio, overlap_ratio=overlap_ratio, winList=windowL)
     return windowL
-
-def generate_image_window(image_path, metadata_path, output_path, target, unit_ratio_list, overlap_ratio=None):
-    # Given an image and its annotation meta data, generate all possible windows with the target
-    windows = exhaustive_search(image_path, metadata_path, target, unit_ratio_list, overlap_ratio)
-    winIndex = 0
-    for win in windows:
-        winIndex += 1
-        win.index = winIndex
-        crop_window(image_path, output_path, win=win, output_name='%s.jpeg' % str(winIndex))
-    return windows
-
-def test4():
-    image_name = "000005"
-    annotation_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/Annotations/%s.xml"
-    metadata_path = annotation_path % image_name
-    input_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/JPEGImages/"
-    output_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/windows/%s/" % (image_name)
-    image_path = input_path + image_name + '.jpg'
-    windows = generate_image_window(image_path, metadata_path, output_path, 'chair', [0.2, 0.3, 0.4, 0.5])
-    save_window_csv(windows, output_path, image_name)
-
-
-test4()

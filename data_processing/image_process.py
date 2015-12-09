@@ -1,18 +1,18 @@
 from xml.etree import ElementTree
 from entity import Picture, Object
-from utility import is_obj_valid, get_all_files, read_feature_vector
+from utility import is_obj_valid, list_all_files, read_feature_vector
 from PIL import Image
 from os import system
 from scipy.cluster.vq import vq
 from numpy import zeros, subtract, add, ndarray, savetxt, asarray
 
-obj_para_list = ['name', 'truncated', 'difficult', 'xmin', 'ymin', 'xmax', 'ymax']
+obj_para_list = ['truncated', 'difficult', 'xmin', 'ymin', 'xmax', 'ymax']
 pic_para_list = ['width', 'height', 'img_id']
 obj_para_map = dict((p, None) for p in obj_para_list)
 pic_para_map = dict((p, None) for p in pic_para_list)
 win_para_map = dict((p, None) for p in [])
 
-def parse_image_metadata(file_path, target_name):
+def parse_image_metadata(file_path):
     DOMTree = ElementTree.parse(file_path)
     # First parse the img_id, width and height of an Image
     pic_para_map['img_id'] = DOMTree.find('filename').text
@@ -22,7 +22,7 @@ def parse_image_metadata(file_path, target_name):
     for obj in DOMTree.iter('object'):
         for o in obj.iter():
             obj_para_map[o.tag] = o.text if o.tag in obj_para_map else None
-        if is_obj_valid(obj_para_map, target_name):
+        if is_obj_valid(obj_para_map):
             pic.obj_set.add(Object(name=obj_para_map['name'], xmin=obj_para_map['xmin'],
                 ymin=obj_para_map['ymin'], xmax=obj_para_map['xmax'], ymax=obj_para_map['ymax']))
     return pic
@@ -44,7 +44,7 @@ def sift_image(input_path, image_name, output_path, params):
 
 def sift_image_batch(input_path, output_path, params):
     # Process all images in the input_path by SIFT, e.g. windows processing
-    image_names = get_all_files(input_path)
+    image_names = list_all_files(input_path)
     res_path_L = []
     for img in image_names:
         im_path = '%s%s.jpg' % (input_path , img)
@@ -65,16 +65,9 @@ def vlad_vector(vector_path, vocabulary):
 def vlad_vector_batch(input_path, output_path, vocabulary):
     # input_path = output/00005/temp_vlad/
     vladL = []
-    vector_names = get_all_files(input_path)
+    vector_names = list_all_files(input_path, onlyImage=True)
     for vec in vector_names:
         vladL.append(vlad_vector(vector_path=vec, vocabulary=vocabulary))
     output_path = output_path + '_vlad.txt'
     savetxt(output_path, asarray(vladL), delimiter=",")
     return output_path
-
-
-
-
-
-
-    

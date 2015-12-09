@@ -25,8 +25,8 @@ class Picture(object):
         return '\n'.join(s)
  
 class Window(object):
-    def __init__(self, xmin, ymin, xmax, ymax):
-        self.index = None
+    def __init__(self, index, xmin, ymin, xmax, ymax):
+        self.index = index
         self.xmin = int(xmin)
         self.ymin = int(ymin)
         self.xmax = int(xmax)
