@@ -1,16 +1,20 @@
-from os import listdir, mkdir, remove
-from os.path import isfile, join, exists
+from os import listdir, makedirs, remove
+from os.path import isfile, join, exists, getsize
 from PIL import Image
-from numpy import loadtxt
+from numpy import loadtxt, reshape
 import shutil
+
+def is_non_zero_file(fpath):
+    # check if a file is empty or not, used for SIFT result
+    return True if isfile(fpath) and getsize(fpath) > 0 else False
 
 def is_obj_valid(para_map):
     return para_map['truncated'] == '0' and para_map['difficult'] == '0'
 
-def check_win_boundary(p, w_xmax, w_ymax):
+def check_win_boundary(w, h, w_xmax, w_ymax):
     # Given a Picture instance, and a candidate window's 
     # coordinate values, check if the window is valid or not
-    return p.width >= w_xmax and p.height >= w_ymax
+    return w >= w_xmax and h >= w_ymax
 
 def computeOverlap(A, B, C, D, E, F, G, H):
         # A=w.xmin, B=w.ymin, C=w.xmax, D=w.ymax
@@ -32,22 +36,29 @@ def read_feature_vector(file_path):
     # Read feature properties and return in matrix form, 
     # i.e. 4 feature locations and 128 descriptors
     f = loadtxt(file_path)
-    return f[:, :4], f[:, 4:]
+    print file_path
+    print f.shape
+    if len(f.shape) > 1:
+        return f[:, 4:]
+    if len(f.shape) == 1:
+        return reshape(f[4:], (-1, 128))
+    return None 
+
 
 def crop_window(input_path, output_path, windows):
     if not exists(output_path):
-        mkdir(output_path)
+        makedirs(output_path)
     else:
         shutil.rmtree(output_path)
     im = Image.open(input_path)
     for win in windows:
         new_im = im.crop((win.xmin, win.ymin, win.xmax, win.ymax))
         new_im_path = '%s%s.jpg' % (output_path, win.index)
-        new_im.save(new_im_path, 'JPG')
-    return True    
+        new_im.save(new_im_path, 'JPEG')
 
 def serialize_window(windows):
     winL = ['index, xmin, ymin, xmax, ymax']
+    i = 0
     for w in windows:
         wL = [w.index, w.xmin, w.ymin, w.xmax, w.ymax]
         wL = [str(i) for i in wL]
@@ -55,15 +66,14 @@ def serialize_window(windows):
     return '\n'.join(winL)
 
 def save_window_txt(windows, output_path, image_name):
-    # Save the meta data of all windows generated of a given image
+    # Save the meta data of all valid windows generated of a given image
     win_txt = image_name + '_windows.txt'
     win_file = output_path + win_txt
     if not exists(output_path):
-        mkdir(output_path)
+        makedirs(output_path)
     win_file = open(win_file, "w")
     win_file.write(serialize_window(windows))
     win_file.close()
-    return True
 
 def get_unprocessed_images(log_path, all_image_path):
     log_List = set(list_all_files(log_path, onlyDir=True))
@@ -79,4 +89,16 @@ def delete_file(file_path, isDir=False):
         shutil.rmtree(file_path)
     else:
         remove(file_path)
-    return True
+
+def validate_windows(input_windows, crop_path, sift_path):
+    # Validate a window given the SIFT result of it
+    valid_windows = []
+    for w in input_windows:
+        i = str(w.index)
+        sift_file = sift_path + i + '_sift.txt'
+        if is_non_zero_file(fpath=sift_file):
+            valid_windows.append(w)
+        else:
+            delete_file(sift_file)
+            delete_file(crop_path + i + '.jpg')
+    return valid_windows

@@ -64,6 +64,7 @@ def mykmeans(data, k, max_iter=max_iter, init_centorid=None):
     for i in xrange(max_iter):
         new_clusters = [[] for j in xrange(k)]
         index = 0
+        print i, "th iteration"
         for x in data:
             index = findCloestCentroid(x, k_centroid)[0]
             new_clusters[index].append(x)
@@ -107,4 +108,5 @@ def mykmeans_plus(data, k, max_iter=max_iter):
         if i == len(dis_array):
             i -= 1
         init_centorid.append(data[i])
-    return mykmeans(data, k, init_centorid=init_centorid)
+    print "mykmeans_plus, done"
+    return mykmeans(data, k, max_iter=max_iter,init_centorid=init_centorid)
