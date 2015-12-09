@@ -1,6 +1,5 @@
 from entity import Window
-from utility import computeOverlap, check_win_boundary
-from io_manager import crop_window, save_window_csv
+from utility import computeOverlap, check_win_boundary, crop_window, save_window_csv
 from image_process import parse_image_metadata
 
 def update_win_label(p, w, threshold=0.5):
@@ -24,6 +23,7 @@ def window_builder(picture, unit_ratio, overlap_ratio=None, winList=None):
     # Pick up the smaller one as the unit width of windows to as to get as many windows as possible
     win_width = int(w * unit_ratio) if w < h else int(h * unit_ratio)
     # Overlap among each square with ratio, if None then no overlap
+    # Overlap_ratio
     overlap = win_width * overlap_ratio if overlap_ratio is not None else win_width
     xmin, ymin, xmax, ymax = 0, 0, win_width, win_width
     while check_win_boundary(p=picture, w_xmax=xmax, w_ymax=ymax):
@@ -40,17 +40,15 @@ def window_builder(picture, unit_ratio, overlap_ratio=None, winList=None):
 
 def exhaustive_search(image_path, metadata_path, target, unit_ratio_list, overlap_ratio=None):
     picture = parse_image_metadata(metadata_path, target_name=target)
-    picture.image_path = image_path
     windowL = []
     if len(picture.obj_set) > 0:
         for ratio in unit_ratio_list:
             window_builder(picture, unit_ratio=ratio, overlap_ratio=overlap_ratio, winList=windowL)
     return windowL
 
-def generate_image_window(input_path, image_name, metadata_path, target, unit_ratio_list, output_path):
-    # Given an image, generate all possible windows with the target
-    image_path = input_path + image_name + '.jpg'
-    windows = exhaustive_search(image_path, metadata_path, target, unit_ratio_list)
+def generate_image_window(image_path, metadata_path, output_path, target, unit_ratio_list, overlap_ratio=None):
+    # Given an image and its annotation meta data, generate all possible windows with the target
+    windows = exhaustive_search(image_path, metadata_path, target, unit_ratio_list, overlap_ratio)
     winIndex = 0
     for win in windows:
         winIndex += 1
@@ -60,10 +58,12 @@ def generate_image_window(input_path, image_name, metadata_path, target, unit_ra
 
 def test4():
     image_name = "000005"
-    metadata_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/Annotations/%s.xml" % image_name
+    annotation_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/Annotations/%s.xml"
+    metadata_path = annotation_path % image_name
     input_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/JPEGImages/"
     output_path = "/Users/Kun/Desktop/CML_Project/VOCdevkit/windows/%s/" % (image_name)
-    windows = generate_image_window(input_path, image_name, metadata_path, 'chair', [0.2, 0.3, 0.4, 0.5], output_path)
+    image_path = input_path + image_name + '.jpg'
+    windows = generate_image_window(image_path, metadata_path, output_path, 'chair', [0.2, 0.3, 0.4, 0.5])
     save_window_csv(windows, output_path, image_name)
 
 
