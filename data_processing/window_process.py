@@ -14,9 +14,11 @@ def get_win_label(p, w, threshold=0.5):
         max_overlap_rate = new_rate if new_rate > max_overlap_rate else max_overlap_rate
     return 1 if max_overlap_rate >= threshold else -1
 
-def window_builder(w, h, unit_ratio, overlap_ratio, winList):
+def window_builder(p, unit_ratio, overlap_ratio, winList):
     # Given a Picture instance, plus the unit_ratio and overlap_ratio of Window, 
     # build a list of candidate windows' boundary
+    w = p.width
+    h = p.height
     winList = [] if winList is None else winList
     # Pick up the smaller one as the unit width of windows to as to get as many windows as possible
     win_width = int(w * unit_ratio) if w < h else int(h * unit_ratio)
@@ -37,8 +39,8 @@ def window_builder(w, h, unit_ratio, overlap_ratio, winList):
 
 def exhaustive_search(image_path, metadata_path, unit_ratio_list, overlap_ratio):
     # Given an image and its annotation meta data, generate all possible windows with the target
-    pic = parse_image_metadata(metadata_path, parseObject=False)
+    p = parse_image_metadata(metadata_path, parseObject=False)
     windowL = []
     for ratio in unit_ratio_list:
-        window_builder(pic.width, pic.height, unit_ratio=ratio, overlap_ratio=overlap_ratio, winList=windowL)
+        window_builder(p=p, unit_ratio=ratio, overlap_ratio=overlap_ratio, winList=windowL)
     return windowL

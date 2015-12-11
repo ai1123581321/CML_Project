@@ -30,14 +30,13 @@ def list_all_files(input_path, onlyImage=False, onlyDir=False):
         return [ f for f in listdir(input_path) if isfile(join(input_path, f)) and f[f.rfind('.') + 1:] in file_suffix]
     if onlyDir:
         return [ f for f in listdir(input_path) if not isfile(join(input_path, f))]
+    # By default, only files will be returned
     return [ f for f in listdir(input_path) if isfile(join(input_path, f)) and f.find('.') > 0]
         
 def read_feature_vector(file_path):
     # Read feature properties and return in matrix form, 
     # i.e. 4 feature locations and 128 descriptors
     f = loadtxt(file_path)
-    print file_path
-    print f.shape
     if len(f.shape) > 1:
         return f[:, 4:]
     if len(f.shape) == 1:
@@ -85,10 +84,11 @@ def get_unprocessed_images(log_path, all_image_path):
     return unprocess_list
 
 def delete_file(file_path, isDir=False):
-    if isDir:
-        shutil.rmtree(file_path)
-    else:
-        remove(file_path)
+    if exists(file_path):
+        if isDir:
+            shutil.rmtree(file_path)
+        else:
+            remove(file_path)
 
 def validate_windows(input_windows, crop_path, sift_path):
     # Validate a window given the SIFT result of it
@@ -102,3 +102,35 @@ def validate_windows(input_windows, crop_path, sift_path):
             delete_file(sift_file)
             delete_file(crop_path + i + '.jpg')
     return valid_windows
+
+def append_file(dest_file, input_path, isInputFile=False):
+    all_file_list = []
+    if isInputFile:
+        all_file_list.append(input_path)
+    else:
+        all_file_list = list_all_files(input_path=input_path)
+    dest_f = open(dest_file, "a")
+    for file_path in all_file_list:
+        if not isInputFile:
+            file_path = input_path + file_path
+        fin = open(file_path, "r")
+        dest_f.write(fin.read())
+        fin.close()
+    dest_f.close()
+    
+def get_target_pos_names(input_path, target, target_count):
+    # input_path = "/Users/Kun/Desktop/CML_Project/sample/VOCdevkit/ImageSets/Main/"
+    # target = "sheep"
+    pos_list = []
+    target_path = '%s%s_train.txt' % (input_path, target)
+    i = 0
+    with open(target_path) as f:
+        for line in f:
+            line = line.split()
+            if line[1] == '1':
+                pos_list.append(line[0])
+                i += 1
+                if i == target_count:
+                    return pos_list
+    return pos_list
+
