@@ -26,7 +26,7 @@ class Picture(object):
  
 class Window(object):
     def __init__(self, index, xmin, ymin, xmax, ymax):
-        self.index = '%02d' % index
+        self.index = '%02d' % int(index)
         self.xmin = int(xmin)
         self.ymin = int(ymin)
         self.xmax = int(xmax)

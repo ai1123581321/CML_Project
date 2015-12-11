@@ -1,7 +1,6 @@
-from os import listdir, makedirs, remove
+from os import listdir, remove
 from os.path import isfile, join, exists, getsize
-from PIL import Image
-from numpy import loadtxt, reshape
+from numpy import loadtxt, reshape, savetxt
 import shutil
 
 def is_non_zero_file(fpath):
@@ -43,37 +42,6 @@ def read_feature_vector(file_path):
         return reshape(f[4:], (-1, 128))
     return None 
 
-
-def crop_window(input_path, output_path, windows):
-    if not exists(output_path):
-        makedirs(output_path)
-    else:
-        shutil.rmtree(output_path)
-    im = Image.open(input_path)
-    for win in windows:
-        new_im = im.crop((win.xmin, win.ymin, win.xmax, win.ymax))
-        new_im_path = '%s%s.jpg' % (output_path, win.index)
-        new_im.save(new_im_path, 'JPEG')
-
-def serialize_window(windows):
-    winL = ['index, xmin, ymin, xmax, ymax']
-    i = 0
-    for w in windows:
-        wL = [w.index, w.xmin, w.ymin, w.xmax, w.ymax]
-        wL = [str(i) for i in wL]
-        winL.append(','.join(wL))
-    return '\n'.join(winL)
-
-def save_window_txt(windows, output_path, image_name):
-    # Save the meta data of all valid windows generated of a given image
-    win_txt = image_name + '_windows.txt'
-    win_file = output_path + win_txt
-    if not exists(output_path):
-        makedirs(output_path)
-    win_file = open(win_file, "w")
-    win_file.write(serialize_window(windows))
-    win_file.close()
-
 def get_unprocessed_images(log_path, all_image_path):
     log_List = set(list_all_files(log_path, onlyDir=True))
     all_images_List = list_all_files(all_image_path, onlyImage=True)
@@ -90,35 +58,24 @@ def delete_file(file_path, isDir=False):
         else:
             remove(file_path)
 
-def validate_windows(input_windows, crop_path, sift_path):
-    # Validate a window given the SIFT result of it
-    valid_windows = []
-    for w in input_windows:
-        i = str(w.index)
-        sift_file = sift_path + i + '_sift.txt'
-        if is_non_zero_file(fpath=sift_file):
-            valid_windows.append(w)
-        else:
-            delete_file(sift_file)
-            delete_file(crop_path + i + '.jpg')
-    return valid_windows
-
-def append_file(dest_file, input_path, isInputFile=False):
-    all_file_list = []
-    if isInputFile:
-        all_file_list.append(input_path)
-    else:
-        all_file_list = list_all_files(input_path=input_path)
+def append_file(dest_file, input_path=None, isSingleFile=False, strInput=None):
     dest_f = open(dest_file, "a")
-    for file_path in all_file_list:
-        if not isInputFile:
-            file_path = input_path + file_path
-        fin = open(file_path, "r")
-        dest_f.write(fin.read())
-        fin.close()
+    if strInput is not None:
+        dest_f.write(strInput)
+    elif input_path is not None:
+        if isSingleFile:
+            fin = open(input_path, "r")
+            dest_f.write(fin.read())
+            fin.close()
+        else:  
+            all_file_list = list_all_files(input_path=input_path)
+            for file_name in all_file_list:
+                fin = open(input_path + file_name, "r")
+                dest_f.write(fin.read())
+                fin.close()
     dest_f.close()
     
-def get_target_pos_names(input_path, target, target_count):
+def get_target_pos_names(input_path, target, target_count=None):
     # input_path = "/Users/Kun/Desktop/CML_Project/sample/VOCdevkit/ImageSets/Main/"
     # target = "sheep"
     pos_list = []
@@ -130,7 +87,12 @@ def get_target_pos_names(input_path, target, target_count):
             if line[1] == '1':
                 pos_list.append(line[0])
                 i += 1
-                if i == target_count:
+                if target_count is not None and i == target_count:
                     return pos_list
     return pos_list
 
+def save_matrix(v, output_path):
+    savetxt(fname=output_path, X=v, fmt='%0.4f', delimiter=',', newline='\n')
+
+def load_matrix(input_path):
+    return loadtxt(fname=input_path, delimiter=',')

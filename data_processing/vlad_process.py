@@ -1,6 +1,7 @@
 from scipy.cluster.vq import vq, kmeans
 from numpy import zeros, subtract, add, ndarray, savetxt, asarray, append
 from utility import read_feature_vector, list_all_files
+from window_process import get_win_label
 # from kmeans.kmeans import mykmeans_plus
 
 def learn_vocabulary(input_path, k, max_iter, single_file):
@@ -33,3 +34,20 @@ def vlad_vector_batch(input_path, output_path, vocabulary):
         vladL.append(vec)
     output_path = output_path + '_vlad.txt'
     savetxt(output_path, asarray(vladL), delimiter=",", fmt='%.4f')
+    
+def get_data_set_X_Y(winL, vladL, pic, target, overlap_threshold):
+        # Given the data of windows and VLAD of a given image
+        # return the concatenated VLAD vector as X, and the label of windows as Y
+        # X and Y should be the same length
+        X, Y = [], []
+        posWinSet, negWinSet = set([]), set([])
+        for i in xrange(len(winL)):
+            posWinSet.add(i) if get_win_label(p=pic, w=winL[i],
+                target=target, threshold=overlap_threshold) else negWinSet.add(i)
+        for i in posWinSet:
+            s = ','.join([str(v) for v in vladL[i]])
+            X.append(s), Y.append('1')
+        for i in negWinSet:
+            s = ','.join([str(v) for v in vladL[i]])
+            X.append(s), Y.append('-1')
+        return ('\n'.join(X), '\n'.join(Y))

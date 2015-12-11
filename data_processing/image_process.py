@@ -5,16 +5,16 @@ from PIL import Image
 from os import system, makedirs
 from os.path import exists
 
-obj_para_list = ['truncated', 'difficult', 'xmin', 'ymin', 'xmax', 'ymax']
+obj_para_list = ['name', 'truncated', 'difficult', 'xmin', 'ymin', 'xmax', 'ymax']
 pic_para_list = ['width', 'height', 'img_id']
 obj_para_map = dict((p, None) for p in obj_para_list)
 pic_para_map = dict((p, None) for p in pic_para_list)
-win_para_map = dict((p, None) for p in [])
 
 def parse_image_metadata(file_path, parseObject=False):
     DOMTree = ElementTree.parse(file_path)
     # First parse the img_id, width and height of an Image
-    pic_para_map['img_id'] = DOMTree.find('filename').text
+    filename = DOMTree.find('filename').text
+    pic_para_map['img_id'] = filename[:filename.rfind('.')]
     for size in DOMTree.find('size').iter():
         pic_para_map[size.tag] = size.text if size.tag in pic_para_map else None
     pic = Picture(img_id=pic_para_map['img_id'], width=pic_para_map['width'], height=pic_para_map['height'])

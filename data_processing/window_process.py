@@ -1,8 +1,12 @@
 from entity import Window
-from utility import computeOverlap, check_win_boundary
+from PIL import Image
+from utility import computeOverlap, check_win_boundary, is_non_zero_file, delete_file
 from image_process import parse_image_metadata
+from os.path import exists
+from os import makedirs
+from shutil import rmtree
 
-def get_win_label(p, w, threshold=0.5):
+def get_win_label(p, w, target, threshold):
     # Given a picture instance, assuming it has more than one valid object
     # update the window's label by calculating the overlap rate of window and objects in picture
     max_overlap_rate = 0
@@ -11,8 +15,9 @@ def get_win_label(p, w, threshold=0.5):
         overlap = computeOverlap(A=w.xmin, B=w.ymin, C=w.xmax, D=w.ymax,
                             E=obj.xmin, F=obj.ymin, G=obj.xmax, H=obj.ymax)
         new_rate = (overlap * 1.0) / obj_area
-        max_overlap_rate = new_rate if new_rate > max_overlap_rate else max_overlap_rate
-    return 1 if max_overlap_rate >= threshold else -1
+        if new_rate > max_overlap_rate and obj.name == target:
+            max_overlap_rate = new_rate
+    return max_overlap_rate >= threshold
 
 def window_builder(p, unit_ratio, overlap_ratio, winList):
     # Given a Picture instance, plus the unit_ratio and overlap_ratio of Window, 
@@ -44,3 +49,57 @@ def exhaustive_search(image_path, metadata_path, unit_ratio_list, overlap_ratio)
     for ratio in unit_ratio_list:
         window_builder(p=p, unit_ratio=ratio, overlap_ratio=overlap_ratio, winList=windowL)
     return windowL
+
+def crop_window(input_path, output_path, windows):
+    if not exists(output_path):
+        makedirs(output_path)
+    else:
+        rmtree(output_path)
+    im = Image.open(input_path)
+    for win in windows:
+        new_im = im.crop((win.xmin, win.ymin, win.xmax, win.ymax))
+        new_im_path = '%s%s.jpg' % (output_path, win.index)
+        new_im.save(new_im_path, 'JPEG')
+
+def serialize_window(windows):
+    winL = ['index, xmin, ymin, xmax, ymax']
+    i = 0
+    for w in windows:
+        wL = [w.index, w.xmin, w.ymin, w.xmax, w.ymax]
+        wL = [str(i) for i in wL]
+        winL.append(','.join(wL))
+    return '\n'.join(winL)
+
+def de_serialize_window(input_path):
+    windowsL = []
+    with open(input_path) as f:
+        for line in f:
+            lines = line.split(",")
+            if len(lines) == 5 and lines[0] != 'index':
+                win = Window(index=lines[0], xmin=lines[1], ymin=lines[2], xmax=lines[3], ymax=lines[4])
+                windowsL.append(win)
+    return windowsL
+
+def save_window_txt(windows, output_path, image_name):
+    # Save the meta data of all valid windows generated of a given image
+    win_txt = image_name + '_windows.txt'
+    win_file = output_path + win_txt
+    if not exists(output_path):
+        makedirs(output_path)
+    win_file = open(win_file, "w")
+    win_file.write(serialize_window(windows))
+    win_file.close()
+
+def validate_windows(input_windows, crop_path, sift_path):
+    # Validate a window given the SIFT result of it
+    # If the result is an empty SIFT file, it is invalid
+    valid_windows = []
+    for w in input_windows:
+        i = str(w.index)
+        sift_file = sift_path + i + '_sift.txt'
+        if is_non_zero_file(fpath=sift_file):
+            valid_windows.append(w)
+        else:
+            delete_file(sift_file)
+            delete_file(crop_path + i + '.jpg')
+    return valid_windows
