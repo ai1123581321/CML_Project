@@ -31,7 +31,8 @@ class Window(object):
         self.ymin = int(ymin)
         self.xmax = int(xmax)
         self.ymax = int(ymax)
-    
+        self.score = None
+        
     def __repr__(self):
         return 'W(index=%s, xmin=%s, ymin=%s, xmax=%s, ymax=%s)' % (
                 self.index, self.xmin, self.ymin, self.xmax, self.ymax)

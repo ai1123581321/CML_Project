@@ -1,6 +1,7 @@
 from os import listdir, remove
 from os.path import isfile, join, exists, getsize
 from numpy import loadtxt, reshape, savetxt
+from sklearn.decomposition import PCA
 import shutil
 
 def is_non_zero_file(fpath):
@@ -35,12 +36,12 @@ def list_all_files(input_path, onlyImage=False, onlyDir=False):
 def read_feature_vector(file_path):
     # Read feature properties and return in matrix form, 
     # i.e. 4 feature locations and 128 descriptors
-    f = loadtxt(file_path)
-    if len(f.shape) > 1:
-        return f[:, 4:]
-    if len(f.shape) == 1:
-        return reshape(f[4:], (-1, 128))
-    return None 
+    X = loadtxt(file_path)
+    if len(X.shape) > 1:
+        X = X[:, 4:]
+    if len(X.shape) == 1:
+        X = reshape(X[4:], (-1, 128))
+    return X
 
 def get_unprocessed_images(log_path, all_image_path):
     log_List = set(list_all_files(log_path, onlyDir=True))
@@ -96,3 +97,9 @@ def save_matrix(v, output_path):
 
 def load_matrix(input_path):
     return loadtxt(fname=input_path, delimiter=',')
+
+def pca_dataset(input_path, delimiter=None, n_com=64):
+    X = loadtxt(fname=input_path, delimiter=delimiter)
+    pca = PCA(n_components=n_com)
+    X_new = pca.fit_transform(X)
+    return X_new
