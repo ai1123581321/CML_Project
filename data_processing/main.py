@@ -14,11 +14,12 @@ max_iter = 5
 voca_path = output_parent_path + "vocabulary.txt"
 dataset_mode = True
 overlap_threshold = 0.5
-preVLAD = True
+preVLAD = False
+vladVector = False
 pca = False
 
 batch_all_images(input_image_path, annotation_path, output_parent_path,
             unit_ratio_list, overlap_ratio, target,
-            target_pos_path, target_count=target_count, pca=pca, k=k, max_iter=max_iter, preVLAD=preVLAD,
+            target_pos_path, target_count=target_count, pca=pca, k=k, max_iter=max_iter, preVLAD=preVLAD,vladVector=vladVector,
             voca_path=voca_path, dataset_mode=dataset_mode, overlap_threshold=overlap_threshold)
 

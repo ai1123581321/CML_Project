@@ -1,7 +1,7 @@
 from xml.etree import ElementTree
 from entity import Picture, Object
 from utility import is_obj_valid, list_all_files, delete_file
-from PIL import Image
+from PIL import Image, ImageDraw
 from os import system, makedirs
 from os.path import exists
 
@@ -57,3 +57,12 @@ def sift_image_batch(input_path, output_path, params=None):
         res_path = sift_image(input_path=input_path, image_name=img, output_path=output_path, params=params)
         res_path_L.append(res_path)
     return res_path_L
+
+def draw_windows_on_image(input_path, windowL, color, img_name):
+    im = Image.open(input_path)
+    for win in windowL:
+        bbox = (win.xmin, win.ymin, win.xmax, win.ymax)
+        draw = ImageDraw.Draw(im)
+        draw.rectangle(bbox, outline=color)
+        del draw
+    im.show(title=img_name)

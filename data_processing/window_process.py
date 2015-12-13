@@ -11,10 +11,10 @@ def get_win_label(p, w, target, threshold):
     # update the window's label by calculating the overlap rate of window and objects in picture
     max_overlap_rate = 0
     for obj in p.obj_set:
-        obj_area = (obj.ymax - obj.ymin) * (obj.xmax - obj.xmin)
+        win_area = (w.ymax - w.ymin) * (w.xmax - w.xmin)
         overlap = computeOverlap(A=w.xmin, B=w.ymin, C=w.xmax, D=w.ymax,
                             E=obj.xmin, F=obj.ymin, G=obj.xmax, H=obj.ymax)
-        new_rate = (overlap * 1.0) / obj_area
+        new_rate = (overlap * 1.0) / win_area
         if new_rate > max_overlap_rate and obj.name == target:
             max_overlap_rate = new_rate
     return max_overlap_rate >= threshold

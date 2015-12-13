@@ -31,7 +31,7 @@ def batch_one_image_dataset(global_X_path, global_Y_path, img_window_path, img_v
     append_file(dest_file=global_Y_path, strInput=Y)
     
 def batch_all_images(input_image_path, annotation_path, output_parent_path,
-            unit_ratio_list, overlap_ratio, target, target_pos_path, target_count=20, pca=True,
+            unit_ratio_list, overlap_ratio, target, target_pos_path, vladVector, target_count=20, pca=True,
             k=30, max_iter=30, preVLAD=False, voca_path=None, dataset_mode=False, overlap_threshold=0.5):
     global_sift_path = '%sglobal_sift.txt' % (output_parent_path)
     image_name_list = get_target_pos_names(input_path=target_pos_path, target=target, target_count=target_count)
@@ -59,15 +59,18 @@ def batch_all_images(input_image_path, annotation_path, output_parent_path,
                     k=k, max_iter=max_iter, single_file=True, vector_matrix=vector_matrix)
         save_matrix(v=vocabulary, output_path=voca_path)
         print "~~~~~~~Learning vocabulary done"
-    else:
+    elif vladVector:
         print "~~~~~~~Loading existing vocabulary"
         vocabulary = load_matrix(input_path=voca_path)
-    for i in xrange(len(image_name_list)):
-        image_name = image_name_list[i]
-        output_path = "%s%s/" % (output_parent_path, image_name)
-        print "\t======Creating VLAD vectors"
-        vlad_vector_batch(input_path=sift_path_L[i], output_path=output_path + image_name, vocabulary=vocabulary)
-        print "\t======VLAD Done for", image_name
+    if vladVector:
+        for i in xrange(len(image_name_list)):
+            image_name = image_name_list[i]
+            output_path = "%s%s/" % (output_parent_path, image_name)
+            print "\t======Creating VLAD vectors"
+            vlad_vector_batch(input_path=sift_path_L[i], output_path=output_path + image_name, vocabulary=vocabulary)
+            print "\t======VLAD Done for", image_name
+    else:
+        print "##########No VLAD vector generated...."
     if dataset_mode:
         print "^^^^^^^^^^Generate data set for global windows and VLAD"
         global_X_path = output_parent_path + "global_X.txt"
@@ -77,7 +80,7 @@ def batch_all_images(input_image_path, annotation_path, output_parent_path,
         for img_name in image_name_list:
             img_window_path = "%s%s/%s_windows.txt" % (output_parent_path, img_name , img_name)
             img_vlad_path = "%s%s/%s_vlad.txt" % (output_parent_path, img_name , img_name)
-            metadata_path = '%s%s.xml' % (annotation_path, image_name)
+            metadata_path = '%s%s.xml' % (annotation_path, img_name)
             batch_one_image_dataset(global_X_path, global_Y_path, img_window_path,
                         img_vlad_path, metadata_path, target, overlap_threshold=overlap_threshold)
             print "\tData set done for", img_name

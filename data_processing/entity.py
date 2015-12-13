@@ -1,10 +1,10 @@
 class Object(object):
     def __init__(self, name, xmin, ymin, xmax, ymax):
         self.name = name
-        self.xmin = int(xmin)
-        self.ymin = int(ymin)
-        self.xmax = int(xmax)
-        self.ymax = int(ymax)
+        self.xmin = int(float(xmin))
+        self.ymin = int(float(ymin))
+        self.xmax = int(float(xmax))
+        self.ymax = int(float(ymax))
     
     def __repr__(self):
         return 'name=%s, xmin=%s, ymin=%s, xmax=%s, ymax=%s' % (self.name,
@@ -36,4 +36,3 @@ class Window(object):
     def __repr__(self):
         return 'W(index=%s, xmin=%s, ymin=%s, xmax=%s, ymax=%s)' % (
                 self.index, self.xmin, self.ymin, self.xmax, self.ymax)
-

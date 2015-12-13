@@ -1,14 +1,15 @@
-from sklearn import decomposition
-import numpy as np
+from sklearn.linear_model import SGDClassifier
+from training import batch_training_display
 
-train = np.random.rand(1050, 4096)
-test = np.random.rand(50, 4096)
-print train.shape
-print test.shape
+working_dir = "/Users/Kun/Desktop/Project_CML/sample/"
+annotation_path = working_dir + "Annotations/"
+img_parent_path = working_dir + "JPEGImages/"
+target = "sheep"
+input_parent_path = working_dir + "output/" + target + "/"
+X_path = input_parent_path + "global_X.txt"
+y_path = input_parent_path + "global_y.txt"
+clf = SGDClassifier(class_weight={1:10})
+threshold = 0.5
 
-pca = decomposition.PCA()
-pca.n_components = 399
-train_reduced = pca.fit_transform(train)
-print train_reduced.shape
-test_reduced = pca.transform(test)
-print test_reduced.shape
+batch_training_display(input_parent_path, X_path, y_path,
+        annotation_path, img_parent_path, target, clf, threshold)
