@@ -1,4 +1,4 @@
-from data_processing.batch import batch_all_images
+from batch import batch_all_images
 
 target = "sheep"
 working_dir = "/Users/Kun/Desktop/Project_CML/sample/"
@@ -8,9 +8,9 @@ output_parent_path = "%soutput/%s/" % (working_dir, target)
 target_pos_path = working_dir + "ImageSets/Main/"
 unit_ratio_list = [0.2, 0.3 , 0.4, 0.5, 0.6, 0.7, 0.8]
 overlap_ratio = 0.1
-target_count = 5
-k = 30
-max_iter = 20
+target_count = None
+k = 3
+max_iter = 5
 voca_path = output_parent_path + "vocabulary.txt"
 dataset_mode = True
 overlap_threshold = 0.5

@@ -1,4 +1,3 @@
-from sklearn.decomposition import PCA
 from sklearn.cross_validation import train_test_split
 from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report
@@ -20,7 +19,10 @@ def training(X_path, y_path, clf):
 
 def cal_window_score(w, vlad_path, window_path):
     vlad_vec = np.loadtxt(fname=vlad_path, delimiter=',')
-    score = np.dot(vlad_vec, w.T)
+    score = np.dot(vlad_vec, w.T).flatten()
+    index = score.argsort()
+    print index[-3:][::-1] + 1
+    print index[0:3][::-1] + 1
     print 'max=', np.argmax(score) + 1
     print 'min=', np.argmin(score) + 1
     # win = np.loadtxt(fname=window_path, delimiter=',')

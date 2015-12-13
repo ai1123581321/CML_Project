@@ -1,0 +1,15 @@
+#Local to HPC
+scp ./global_sift.txt kl1885@hpc.nyu.edu:~/
+#HPC to Dumbo
+scp ./global_sift.txt dumbo:~/CML/project/data/output/sheep/
+
+#Dumbo to HPC
+scp ./vocabulary.txt kl1885@hpc.nyu.edu:~/
+#HPC to local
+scp kl1885@hpc.nyu.edu:~/vocabulary.txt ./Desktop/
+
+#Python main
+python ~/CML/project/CML_Project/data_processing/main.py
+
+#Other
+module load python/gnu/2.7.10
