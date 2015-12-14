@@ -10,7 +10,7 @@ pic_para_list = ['width', 'height', 'img_id']
 obj_para_map = dict((p, None) for p in obj_para_list)
 pic_para_map = dict((p, None) for p in pic_para_list)
 
-def parse_image_metadata(file_path, parseObject=False):
+def parse_image_metadata(file_path, parseObject=True):
     DOMTree = ElementTree.parse(file_path)
     # First parse the img_id, width and height of an Image
     filename = DOMTree.find('filename').text

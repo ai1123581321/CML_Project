@@ -12,4 +12,4 @@ scp kl1885@hpc.nyu.edu:~/vocabulary.txt ./Desktop/
 python ~/CML/project/CML_Project/data_processing/main.py
 
 #Other
-module load python/gnu/2.7.10
+module load scikit-learn/intel/0.17

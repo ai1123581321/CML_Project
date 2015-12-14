@@ -6,6 +6,6 @@
 #PBS -N learn_vocabulary_job
 
 module purge
-module load python/gnu/2.7.10
+module load python/intel/2.7.9
 
 python ~/CML/project/CML_Project/data_processing/main.py
