@@ -1,7 +1,7 @@
 from entity import Window
 from PIL import Image
 from utility import computeOverlap, check_win_boundary, is_non_zero_file, delete_file
-from image_process import parse_image_metadata
+from image_process import parse_image_metadata, draw_windows_on_image
 from os.path import exists
 from os import makedirs
 from shutil import rmtree
@@ -103,3 +103,20 @@ def validate_windows(input_windows, crop_path, sift_path):
             delete_file(sift_file)
             delete_file(crop_path + i + '.jpg')
     return valid_windows
+
+def window_display(img_path, windowL, pos_index, neg_index, pos_color, neg_color,
+                pic, target, threshold, output_path=None, img_name=None):
+    posW = [windowL[i - 1] for i in pos_index]
+    negW = [windowL[i - 1] for i in neg_index]
+    posLabel = [get_win_label(w=w, p=pic, target='sheep', threshold=0.5) for w in posW]
+    negLabel = [get_win_label(w=w, p=pic, target='sheep', threshold=0.5) for w in negW]
+    img_obj = Image.open(img_path)
+    draw_windows_on_image(img_obj=img_obj, color=pos_color, windowL=posW)
+    draw_windows_on_image(img_obj=img_obj, color=neg_color, windowL=negW)
+    if output_path is not None:
+        if not exists(output_path):
+            makedirs(output_path)
+        img_obj.save(output_path + img_name + '.bmp', 'bmp')
+    else:
+        img_obj.show()
+    return posLabel, negLabel

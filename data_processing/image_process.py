@@ -58,11 +58,9 @@ def sift_image_batch(input_path, output_path, params=None):
         res_path_L.append(res_path)
     return res_path_L
 
-def draw_windows_on_image(input_path, windowL, color, img_name):
-    im = Image.open(input_path)
+def draw_windows_on_image(img_obj, windowL, color):
     for win in windowL:
         bbox = (win.xmin, win.ymin, win.xmax, win.ymax)
-        draw = ImageDraw.Draw(im)
+        draw = ImageDraw.Draw(img_obj)
         draw.rectangle(bbox, outline=color)
         del draw
-    im.show(title=img_name)

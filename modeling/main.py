@@ -10,6 +10,6 @@ X_path = input_parent_path + "global_X.txt"
 y_path = input_parent_path + "global_y.txt"
 clf = SGDClassifier(class_weight={1:10})
 threshold = 0.5
-
+img_output_path = input_parent_path + 'trained_windows/'
 batch_training_display(input_parent_path, X_path, y_path,
-        annotation_path, img_parent_path, target, clf, threshold)
+        annotation_path, img_parent_path, target, clf, threshold, img_output_path)
