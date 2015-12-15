@@ -1,7 +1,7 @@
 from batch import batch_all_images
 
-target = "sheep"
-working_dir = "/Users/Kun/Desktop/Project_CML/sample/"
+target = "bicycle"
+working_dir = "/Users/Kun/Desktop/Project_CML/"
 input_image_path = working_dir + "JPEGImages/"
 annotation_path = working_dir + "Annotations/"
 output_parent_path = "%soutput/%s/" % (working_dir, target)
@@ -14,7 +14,7 @@ max_iter = 5
 voca_path = output_parent_path + "vocabulary.txt"
 dataset_mode = True
 overlap_threshold = 0.5
-preVLAD = False
+preVLAD = True
 vladVector = False
 pca = False
 

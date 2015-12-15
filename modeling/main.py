@@ -11,6 +11,9 @@ y_path = input_parent_path + "global_y.txt"
 clf = SGDClassifier()
 threshold = 0.5
 topn = 3
+isScale = False
+balance = False
 img_output_path = input_parent_path + 'trained_windows/'
 batch_training_display(input_parent_path, X_path, y_path,
-        annotation_path, img_parent_path, target, topn, clf, threshold, img_output_path)
+        annotation_path, img_parent_path, target, topn, clf, threshold, img_output_path,
+        isScale, balance)
