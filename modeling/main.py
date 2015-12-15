@@ -1,7 +1,7 @@
 from sklearn.linear_model import SGDClassifier
 from training import batch_training_display
 
-working_dir = "/Users/Kun/Desktop/Project_CML/sample/"
+working_dir = "/Users/Kun/Desktop/Project_CML/"
 annotation_path = working_dir + "Annotations/"
 img_parent_path = working_dir + "JPEGImages/"
 target = "sheep"

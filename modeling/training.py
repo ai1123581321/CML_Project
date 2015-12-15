@@ -33,23 +33,11 @@ def cal_window_score(w, vlad_path, y_pred, topn=3):
     pos_index, neg_index = [], []
     for i in xrange(len(vlad_vec)):
         pos_index.append(i) if (y_pred[i] == 1) else neg_index.append(i)
-    pos_vlad_vec = [vlad_vec[i] for i in pos_index]
-    # neg_vlad_vec = [vlad_vec[i] for i in neg_index]
-    pos_vlad_vec, neg_vlad_vec = [], []
-    for i in pos_index:
-        score = np.dot(vlad_vec[i], w.T)
-        pos_vlad_vec.append((i, score))
-    neg_vlad_vec = [(vlad_vec[i], np.dot(vlad_vec[i], w.T)) for i in neg_index]
-    # sorted_pos_vlad = sorted(pos_vlad_vec, key=lambda x: x[1])
-    # sorted_neg_vlad = sorted(neg_vlad_vec, key=lambda x: x[1])
-    pos_score = np.dot(pos_vlad_vec, w.T).flatten().argsort()
-    neg_score = np.dot(neg_vlad_vec, w.T).flatten().argsort()
-    max_index = pos_score[-topn:][::-1]
-    min_index = neg_score[0:topn][::-1]
-    print max_index, min_index
-    print pos_score[max_index], neg_score[min_index]
+    pos_scores = np.array([np.dot(vlad_vec[i], w.T) for i in pos_index])
+    neg_scores = np.array([np.dot(vlad_vec[i], w.T) for i in neg_index])
+    max_index = pos_scores.flatten().argsort()[-topn:][::-1]
+    min_index = neg_scores.flatten().argsort()[0:topn][::-1]
     return max_index, min_index
-
 
 def batch_training_display(input_parent_path, X_path, y_path,
             annotation_path, img_parent_path, target, topn, clf, threshold, img_output_path=None,
@@ -79,7 +67,7 @@ def batch_training_display(input_parent_path, X_path, y_path,
         windowL = de_serialize_window(input_path=window_path)
         max_i, min_i = cal_window_score(w=clf.coef_, vlad_path=vlad_path,
                     y_pred=y_pred[vlad_offset: vlad_offset + len(windowL)], topn=topn)
-        print "max=", max_i, "min=", min_i
+        print "max pos=", max_i, "min neg=", min_i
         vlad_offset += len(windowL)
         img_path = img_parent_path + img_name + ".jpg"
         pic = parse_image_metadata(file_path=annotation_path + img_name + ".xml", parseObject=True)
