@@ -3,7 +3,7 @@ from sklearn.metrics import classification_report
 import numpy as np
 from data_processing.window_process import de_serialize_window, window_display
 from data_processing.image_process import parse_image_metadata
-from data_processing.utility import list_all_files , write_to_file
+from data_processing.utility import list_all_files, write_to_file, log_processing
 from os.path import exists
 from sklearn.preprocessing import StandardScaler
 from random import sample
@@ -38,10 +38,6 @@ def cal_window_score(w, vlad_path, y_pred, topn=3):
     max_index = pos_scores.flatten().argsort()[-topn:][::-1]
     min_index = neg_scores.flatten().argsort()[0:topn][::-1]
     return max_index, min_index
-
-def log_processing(log_L, message):
-    log_L.append(message)
-    print message
 
 def batch_training_display(input_parent_path, X_path, y_path,
             annotation_path, img_parent_path, target, topn, clf, threshold, windows_output_path=None,

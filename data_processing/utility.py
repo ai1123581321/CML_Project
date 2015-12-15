@@ -109,3 +109,6 @@ def write_to_file(file_path, strMessage):
     f.write(strMessage)
     f.close()
     
+def log_processing(log_L, message):
+    log_L.append(message)
+    print message
