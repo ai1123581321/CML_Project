@@ -103,3 +103,9 @@ def pca_dataset(input_path, delimiter=None, n_com=64):
     pca = PCA(n_components=n_com)
     X_new = pca.fit_transform(X)
     return X_new
+
+def write_to_file(file_path, strMessage):
+    f = open(file_path, 'w+')
+    f.write(strMessage)
+    f.close()
+    
