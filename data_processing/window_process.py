@@ -5,7 +5,6 @@ from image_process import parse_image_metadata, draw_windows_on_image
 from os.path import exists
 from os import makedirs
 from shutil import rmtree
-from datetime import datetime
 
 def get_win_label(p, w, target, threshold):
     # Given a picture instance, assuming it has more than one valid object

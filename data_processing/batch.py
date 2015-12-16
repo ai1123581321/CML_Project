@@ -46,9 +46,9 @@ def batch_all_images(input_image_path, annotation_path, output_parent_path,
             append_file(dest_file=global_sift_path, input_path=win_sift_path)
         print "----------pre-VLAD Done"
     else:
-        all_dir = list_all_files(input_path=output_parent_path, onlyDir=True)
+        all_dir = list_all_files(input_path=output_parent_path + 'windows/', onlyDir=True)
         for d in all_dir:
-            sift_path_L.append("%s%s/temp_sift/" % (output_parent_path, d))
+            sift_path_L.append("%s/windows/%s/temp_sift/" % (output_parent_path, d))
         print "----------pre-VLAD is enabled"
     if voca_path is None or not isfile(voca_path):
         print "~~~~~~~Learning vocabulary by the sift vectors of all windows of all images"
@@ -65,9 +65,10 @@ def batch_all_images(input_image_path, annotation_path, output_parent_path,
     if vladVector:
         for i in xrange(len(image_name_list)):
             image_name = image_name_list[i]
-            output_path = "%s%s/" % (output_parent_path, image_name)
+            output_path = "%swindows/%s/%s" % (output_parent_path, image_name, image_name)
             print "\t======Creating VLAD vectors"
-            vlad_vector_batch(input_path=sift_path_L[i], output_path=output_path + image_name, vocabulary=vocabulary)
+            vlad_vector_batch(input_path=sift_path_L[i],
+                    output_path=output_path, vocabulary=vocabulary)
             print "\t======VLAD Done for", image_name
     else:
         print "##########No VLAD vector generated...."
@@ -78,8 +79,8 @@ def batch_all_images(input_image_path, annotation_path, output_parent_path,
         delete_file(global_X_path)
         delete_file(global_Y_path)
         for img_name in image_name_list:
-            img_window_path = "%s%s/%s_windows.txt" % (output_parent_path, img_name , img_name)
-            img_vlad_path = "%s%s/%s_vlad.txt" % (output_parent_path, img_name , img_name)
+            img_window_path = "%s/windows/%s/%s_windows.txt" % (output_parent_path, img_name , img_name)
+            img_vlad_path = "%s/windows/%s/%s_vlad.txt" % (output_parent_path, img_name , img_name)
             metadata_path = '%s%s.xml' % (annotation_path, img_name)
             batch_one_image_dataset(global_X_path, global_Y_path, img_window_path,
                         img_vlad_path, metadata_path, target, overlap_threshold=overlap_threshold)

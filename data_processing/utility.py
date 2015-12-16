@@ -3,6 +3,7 @@ from os.path import isfile, join, exists, getsize
 from numpy import loadtxt, reshape, savetxt
 from sklearn.decomposition import PCA
 import shutil
+from posix import mkdir
 
 def is_non_zero_file(fpath):
     # check if a file is empty or not, used for SIFT result
@@ -32,7 +33,7 @@ def list_all_files(input_path, onlyImage=False, onlyDir=False):
         return [ f for f in listdir(input_path) if not isfile(join(input_path, f))]
     # By default, only files will be returned
     return [ f for f in listdir(input_path) if isfile(join(input_path, f)) and f.find('.') > 0]
-        
+
 def read_feature_vector(file_path):
     # Read feature properties and return in matrix form, 
     # i.e. 4 feature locations and 128 descriptors
@@ -105,6 +106,9 @@ def pca_dataset(input_path, delimiter=None, n_com=64):
     return X_new
 
 def write_to_file(file_path, strMessage):
+    dirPath = file_path[:file_path.rfind('/')]
+    if not exists(dirPath):
+        mkdir(dirPath)
     f = open(file_path, 'w+')
     f.write(strMessage)
     f.close()
