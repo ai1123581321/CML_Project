@@ -7,4 +7,4 @@ Implemented own version of K-Means algorithm to learn vocabularies of images
 
 Data pipeline workflow:
 
-![Query](image/pipeline.jpg)
+![Query](image/pipeline.png)
