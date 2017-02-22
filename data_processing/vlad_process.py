@@ -19,11 +19,12 @@ def learn_vocabulary(k, max_iter, single_file, vector_matrix=None, input_path=No
 
 def vlad_vector(vector_path, vocabulary):
     features = read_feature_vector(vector_path)
-    codes = vq(features, vocabulary)[0]
-    vlad = zeros(vocabulary.shape)
-    for idx in range(codes.size):
-        diff = subtract(features[idx], vocabulary[codes[idx]])
-        vlad[codes[idx]] = add(diff, vlad[codes[idx]])
+    codes_idx = vq(features, vocabulary)[0] #A length M array holding the code book index for each observation
+    vlad = zeros(vocabulary.shape) 
+    for i in range(codes_idx.size):
+        code_idx = codes_idx[i]
+        diff = subtract(features[i], vocabulary[code_idx])
+        vlad[code_idx] = add(diff, vlad[code_idx])
     return ndarray.flatten(vlad)
     
 def vlad_vector_batch(input_path, output_path, vocabulary):
